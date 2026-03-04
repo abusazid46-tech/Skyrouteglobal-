@@ -766,3 +766,70 @@ img.error-fallback {
         scroll-behavior: auto !important;
     }
 }
+/* Add these optimizations at the end of your styles.css */
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Use hardware acceleration for smooth scrolling */
+* {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Optimize animations - use transform instead of top/left */
+.card, .romance-card, .feature-item, .testimonial-card {
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU acceleration */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Reduce repaints on scroll */
+.navbar {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Optimize hover effects - use transform only */
+.card:hover {
+    transform: translateY(-8px) scale(1.01) translateZ(0);
+}
+
+/* Reduce animation complexity on scroll */
+@media (prefers-reduced-motion: no-preference) {
+    .card, .romance-card {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* Optimize images */
+img {
+    content-visibility: auto; /* Only render when visible */
+    loading="lazy"; /* Already have this */
+}
+
+/* Optimize sections */
+section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px; /* Reserve space */
+}
+
+/* Fix scroll jank */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Optimize floating buttons */
+.floating-buttons {
+    transform: translateZ(0);
+    will-change: transform;
+    }
