@@ -1,0 +1,95 @@
+{
+  "site": {
+    "title": "Sky Route Global",
+    "phone": "+919395319499",
+    "email": "skyrouteglobal1@gmail.com",
+    "address": "Jalukbari AEC campus, Ghy 13, Assam",
+    "workingHours": "Mon-Sat: 9:00 AM - 7:00 PM",
+    "logo": "https://i.ibb.co/Xx0NhkQY/IMG-20260226-000854.png",
+    "favicon": "https://i.ibb.co/JwGLLvyP/IMG-20260225-234708.png"
+  },
+  "packages": {
+    "domestic": [
+      {
+        "id": "goa-1",
+        "name": "Goa",
+        "price": 6999,
+        "duration": "4N/5D",
+        "rating": 4.7,
+        "reviews": 1200,
+        "highlights": ["Beach parties & water sports", "Portuguese heritage tour", "Special dinner at Candolim"],
+        "image": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2",
+        "description": "Experience the vibrant beaches and Portuguese heritage of Goa"
+      }
+    ],
+    "international": [
+      {
+        "id": "dubai-1",
+        "name": "Dubai",
+        "price": 24999,
+        "duration": "5N/6D",
+        "rating": 4.9,
+        "reviews": 2300,
+        "highlights": ["Burj Khalifa at the top", "Desert safari with BBQ", "Dubai Frame & museum"],
+        "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
+        "description": "Experience luxury and adventure in the heart of UAE"
+      }
+    ],
+    "honeymoon": [
+      {
+        "id": "kashmir-honeymoon-1",
+        "name": "Kashmir Honeymoon",
+        "price": 15999,
+        "duration": "5N/6D",
+        "rating": 4.8,
+        "reviews": 950,
+        "highlights": ["Shikara ride on Dal Lake", "Gulmarg Gondola", "Special Kashmiri wazwan"],
+        "image": "https://i.ibb.co/9HJ3sym7/kashmir-honeymoon-500x350-3.jpg",
+        "description": "Romantic escape to the paradise on earth"
+      }
+    ]
+  },
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Priya",
+      "location": "Guwahati",
+      "text": "Sky Route made our Kashmir trip memorable. So affordable!",
+      "rating": 5,
+      "image": "https://i.ibb.co/kgfvmCxG/images-4.jpg"
+    }
+  ],
+  "hero": {
+    "title": "Affordable Domestic & International Tours",
+    "subtitle": "Explore India and the World with Sky Route Global – budget friendly since 2017",
+    "trustText": "Trusted by 500+ Travelers from worldwide ⭐⭐⭐⭐⭐",
+    "image": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800"
+  },
+  "features": [
+    {
+      "icon": "wallet",
+      "title": "Budget Friendly",
+      "description": "Packages that fit your pocket"
+    },
+    {
+      "icon": "map",
+      "title": "Customizable Tours",
+      "description": "Tailor your itinerary"
+    },
+    {
+      "icon": "headset",
+      "title": "24/7 Customer Support",
+      "description": "We're always here"
+    },
+    {
+      "icon": "handshake",
+      "title": "Trusted Partner",
+      "description": "500+ happy travelers"
+    }
+  ],
+  "seo": {
+    "metaDescription": "Affordable domestic & international tour packages from Northeast India. Family trips, honeymoon, group tours. Enquire on WhatsApp. Trusted by 500+ travelers.",
+    "metaKeywords": "travel agency Assam, budget tours Delhi, domestic packages, international holidays, Goa Kashmir Kerala Dubai Thailand Vietnam, honeymoon packages, Kaziranga tour, Meghalaya tour, Arunachal tour, Nagaland tour",
+    "ogImage": "https://i.ibb.co/JwGLLvyP/IMG-20260225-234708.png"
+  }
+}
