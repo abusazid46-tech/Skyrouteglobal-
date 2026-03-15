@@ -12,7 +12,76 @@ function debounce(func, wait = 100) {
         timeout = setTimeout(later, wait);
     };
 }
+// ===== ADD THIS AT THE BOTTOM OF YOUR EXISTING main.js =====
 
+// ===== ADMIN PANEL INTEGRATION =====
+// These functions will only run if site data is loaded from admin panel
+// They won't affect existing functionality if admin panel isn't used
+
+async function loadDynamicContent() {
+    try {
+        // Try to fetch from admin API (fails silently if not available)
+        const response = await fetch('/api/content').catch(() => null);
+        if (!response || !response.ok) return;
+        
+        const siteData = await response.json();
+        updateContentFromAdmin(siteData);
+    } catch (e) {
+        // Silently fail - site continues with static content
+        console.log('Using static content');
+    }
+}
+
+function updateContentFromAdmin(data) {
+    if (!data) return;
+    
+    // Update testimonials if they exist on page
+    if (data.testimonials && document.querySelector('.testimonial-card')) {
+        const cards = document.querySelectorAll('.testimonial-card');
+        data.testimonials.slice(0, cards.length).forEach((testimonial, i) => {
+            const card = cards[i];
+            if (!card) return;
+            
+            const textEl = card.querySelector('p');
+            const customerEl = card.querySelector('.customer');
+            const imgEl = card.querySelector('.customer-photo');
+            
+            if (textEl) textEl.textContent = testimonial.text;
+            if (customerEl) customerEl.textContent = `— ${testimonial.name}, ${testimonial.location}`;
+            if (imgEl) imgEl.src = testimonial.image;
+        });
+    }
+    
+    // Update contact info if on contact page
+    if (data.site && document.querySelector('.contact-info')) {
+        const site = data.site;
+        
+        document.querySelectorAll('.contact-info p').forEach(p => {
+            if (p.innerHTML.includes('fa-phone-alt')) {
+                p.innerHTML = `<i class="fas fa-phone-alt"></i> ${site.phone}`;
+            }
+            if (p.innerHTML.includes('fa-whatsapp')) {
+                p.innerHTML = `<i class="fab fa-whatsapp"></i> ${site.phone}`;
+            }
+            if (p.innerHTML.includes('fa-envelope')) {
+                p.innerHTML = `<i class="fas fa-envelope"></i> ${site.email}`;
+            }
+            if (p.innerHTML.includes('fa-map-marker-alt')) {
+                p.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${site.address}`;
+            }
+        });
+    }
+}
+
+// Initialize dynamic content loading after page load
+if ('requestIdleCallback' in window) {
+    requestIdleCallback(loadDynamicContent, { timeout: 3000 });
+} else {
+    setTimeout(loadDynamicContent, 1000);
+}
+
+// Make these available globally
+window.loadDynamicContent = loadDynamicContent;
 // Throttle function for scroll events
 function throttle(func, limit = 100) {
     let inThrottle;
