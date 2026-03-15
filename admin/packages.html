@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Packages - Sky Route Global Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .package-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .highlight-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-item input {
+            flex: 1;
+        }
+
+        .remove-highlight {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-highlight {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .save-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            background: #764ba2;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar (same as dashboard) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.ibb.co/Xx0NhkQY/IMG-20260226-000854.png" alt="Logo">
+                <h3>Sky Route Admin</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-dashboard"></i> Dashboard
+                </a>
+                <a href="packages.html" class="nav-link active">
+                    <i class="fas fa-box"></i> Packages
+                </a>
+                <a href="testimonials.html" class="nav-link">
+                    <i class="fas fa-star"></i> Testimonials
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-gear"></i> Settings
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Manage Packages</h1>
+                <div>
+                    <button class="filter-btn active" data-type="all">All</button>
+                    <button class="filter-btn" data-type="domestic">Domestic</button>
+                    <button class="filter-btn" data-type="international">International</button>
+                    <button class="filter-btn" data-type="honeymoon">Honeymoon</button>
+                </div>
+                <button class="btn-primary" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Add Package
+                </button>
+            </header>
+
+            <div class="table-container">
+                <table class="data-table" id="packagesTable">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Package Name</th>
+                            <th>Type</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packagesList">
+                        <tr>
+                            <td colspan="7" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Package Modal -->
+    <div id="packageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Package</h2>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+
+            <form id="packageForm">
+                <input type="hidden" id="packageId">
+                
+                <div class="form-group">
+                    <label>Package Type</label>
+                    <select id="packageType" required>
+                        <option value="">Select Type</option>
+                        <option value="domestic">Domestic</option>
+                        <option value="international">International</option>
+                        <option value="honeymoon">Honeymoon</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Package Name</label>
+                    <input type="text" id="packageName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Duration (e.g., 4N/5D)</label>
+                    <input type="text" id="packageDuration" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="packagePrice" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Rating (1-5)</label>
+                    <input type="number" id="packageRating" step="0.1" min="0" max="5" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Reviews</label>
+                    <input type="number" id="packageReviews" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="packageImage" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="packageDescription" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Highlights</label>
+                    <div id="highlightsContainer"></div>
+                    <button type="button" class="add-highlight" onclick="addHighlight()">+ Add Highlight</button>
+                </div>
+
+                <button type="submit" class="save-btn">Save Package</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let packages = {};
+
+        // Check authentication
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/admin/index.html';
+        }
+
+        // Load packages
+        async function loadPackages() {
+            try {
+                const response = await fetch('/api/packages');
+                packages = await response.json();
+                displayPackages();
+            } catch (error) {
+                console.error('Error loading packages:', error);
+            }
+        }
+
+        // Display packages with filter
+        function displayPackages() {
+            const tbody = document.getElementById('packagesList');
+            let allPackages = [];
+
+            Object.keys(packages).forEach(type => {
+                if (currentFilter === 'all' || currentFilter === type) {
+                    packages[type].forEach(pkg => {
+                        allPackages.push({...pkg, type});
+                    });
+                }
+            });
+
+            if (allPackages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No packages found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allPackages.map(pkg => `
+                <tr>
+                    <td>
+                        <img src="${pkg.image}" alt="${pkg.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                    </td>
+                    <td>${pkg.name}</td>
+                    <td><span class="badge badge-${pkg.type}">${pkg.type}</span></td>
+                    <td>${pkg.duration}</td>
+                    <td>₹${pkg.price?.toLocaleString()}</td>
+                    <td>⭐ ${pkg.rating || 'N/A'} (${pkg.reviews || 0})</td>
+                    <td>
+                        <button onclick="editPackage('${pkg.type}', '${pkg.id}')" class="btn-icon"><i class="fas fa-edit"></i></button>
+                        <button onclick="deletePackage('${pkg.type}', '${pkg.id}')" class="btn-icon"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.type;
+                displayPackages();
+            });
+        });
+
+        // Modal functions
+        let highlights = [];
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Package';
+            document.getElementById('packageForm').reset();
+            document.getElementById('packageId').value = '';
+            highlights = [''];
+            renderHighlights();
+            document.getElementById('packageModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('packageModal').classList.remove('show');
+        }
+
+        function addHighlight() {
+            highlights.push('');
+            renderHighlights();
+        }
+
+        function removeHighlight(index) {
+            highlights.splice(index, 1);
+            renderHighlights();
+        }
+
+        function renderHighlights() {
+            const container = document.getElementById('highlightsContainer');
+            container.innerHTML = highlights.map((highlight, index) => `
+                <div class="highlight-item">
+                    <input type="text" value="${highlight}" placeholder="Enter highlight" data-index="${index}">
+                    <button type="button" class="remove-highlight" onclick="removeHighlight(${index})">×</button>
+                </div>
+            `).join('');
+
+            // Add event listeners to inputs
+            container.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', function() {
+                    highlights[this.dataset.index] = this.value;
+                });
+            });
+        }
+
+        async function editPackage(type, id) {
+            try {
+                const response = await fetch(`/api/packages?type=${type}&id=${id}`);
+                const pkg = await response.json();
+
+                document.getElementById('modalTitle').textContent = 'Edit Package';
+                document.getElementById('packageId').value = id;
+                document.getElementById('packageType').value = type;
+                document.getElementById('packageName').value = pkg.name;
+                document.getElementById('packageDuration').value = pkg.duration;
+                document.getElementById('packagePrice').value = pkg.price;
+                document.getElementById('packageRating').value = pkg.rating;
+                document.getElementById('packageReviews').value = pkg.reviews;
+                document.getElementById('packageImage').value = pkg.image;
+                document.getElementById('packageDescription').value = pkg.description || '';
+
+                highlights = pkg.highlights || [];
+                renderHighlights();
+
+                document.getElementById('packageModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading package:', error);
+                alert('Failed to load package');
+            }
+        }
+
+        async function deletePackage(type, id) {
+            if (!confirm('Are you sure you want to delete this package?')) return;
+
+            try {
+                const response = await fetch(`/api/packages?type=${type}&id=${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    loadPackages();
+                } else {
+                    alert('Failed to delete package');
+                }
+            } catch (error) {
+                console.error('Error deleting package:', error);
+                alert('Failed to delete package');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('packageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const pkg = {
+                name: document.getElementById('packageName').value,
+                duration: document.getElementById('packageDuration').value,
+                price: parseInt(document.getElementById('packagePrice').value),
+                rating: parseFloat(document.getElementById('packageRating').value),
+                reviews: parseInt(document.getElementById('packageReviews').value),
+                image: document.getElementById('packageImage').value,
+                description: document.getElementById('packageDescription').value,
+                highlights: highlights.filter(h => h.trim() !== '')
+            };
+
+            const type = document.getElementById('packageType').value;
+            const id = document.getElementById('packageId').value;
+
+            try {
+                let response;
+                if (id) {
+                    // Update
+                    response = await fetch('/api/packages', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ type, id, pkg })
+                    });
+                } else {
+                    // Create
+                    response = await fetch('/api/packages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ type, pkg })
+                    });
+                }
+
+                if (response.ok) {
+                    closeModal();
+                    loadPackages();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to save package');
+                }
+            } catch (error) {
+                console.error('Error saving package:', error);
+                alert('Failed to save package');
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/admin/index.html';
+        }
+
+        // Initial load
+        loadPackages();
+    </script>
+</body>
+</html>
