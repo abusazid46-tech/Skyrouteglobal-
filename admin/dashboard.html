@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sky Route Global Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.ibb.co/Xx0NhkQY/IMG-20260226-000854.png" alt="Logo">
+                <h3>Sky Route Admin</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-dashboard"></i> Dashboard
+                </a>
+                <a href="packages.html" class="nav-link">
+                    <i class="fas fa-box"></i> Packages
+                </a>
+                <a href="testimonials.html" class="nav-link">
+                    <i class="fas fa-star"></i> Testimonials
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-gear"></i> Settings
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="username">Admin</span>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalPackages">0</h3>
+                        <p>Total Packages</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalTestimonials">0</h3>
+                        <p>Testimonials</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>500+</h3>
+                        <p>Happy Travelers</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>2017</h3>
+                        <p>Since</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="actions-grid">
+                    <a href="packages.html" class="action-card">
+                        <i class="fas fa-plus-circle"></i>
+                        <h4>Add Package</h4>
+                        <p>Create a new tour package</p>
+                    </a>
+
+                    <a href="testimonials.html" class="action-card">
+                        <i class="fas fa-pen"></i>
+                        <h4>Add Testimonial</h4>
+                        <p>Add customer review</p>
+                    </a>
+
+                    <a href="settings.html" class="action-card">
+                        <i class="fas fa-globe"></i>
+                        <h4>Update SEO</h4>
+                        <p>Edit meta descriptions</p>
+                    </a>
+
+                    <a href="#" class="action-card" onclick="previewSite()">
+                        <i class="fas fa-eye"></i>
+                        <h4>Preview Site</h4>
+                        <p>View live website</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="recent-packages">
+                <h2>Recent Packages</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Package Name</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentPackagesList">
+                        <tr>
+                            <td colspan="5" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/admin/index.html';
+        }
+
+        // Set username
+        document.getElementById('username').textContent = localStorage.getItem('adminUser') || 'Admin';
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load packages
+                const packagesResponse = await fetch('/api/packages');
+                const packagesData = await packagesResponse.json();
+                
+                let totalPackages = 0;
+                Object.keys(packagesData).forEach(type => {
+                    totalPackages += packagesData[type].length;
+                });
+                document.getElementById('totalPackages').textContent = totalPackages;
+
+                // Load testimonials
+                const contentResponse = await fetch('/api/content?section=testimonials');
+                const contentData = await contentResponse.json();
+                document.getElementById('totalTestimonials').textContent = contentData.length || 0;
+
+                // Show recent packages
+                const recentPackages = [];
+                Object.keys(packagesData).forEach(type => {
+                    packagesData[type].forEach(pkg => {
+                        recentPackages.push({...pkg, type});
+                    });
+                });
+
+                // Sort by newest first (assuming IDs contain timestamp)
+                recentPackages.sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+
+                const tbody = document.getElementById('recentPackagesList');
+                if (recentPackages.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No packages found</td></tr>';
+                } else {
+                    tbody.innerHTML = recentPackages.slice(0, 5).map(pkg => `
+                        <tr>
+                            <td>${pkg.name}</td>
+                            <td><span class="badge badge-${pkg.type}">${pkg.type}</span></td>
+                            <td>₹${pkg.price?.toLocaleString()}</td>
+                            <td>⭐ ${pkg.rating || 'N/A'}</td>
+                            <td>
+                                <button onclick="editPackage('${pkg.type}', '${pkg.id}')" class="btn-icon"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function editPackage(type, id) {
+            window.location.href = `/admin/packages.html?type=${type}&id=${id}`;
+        }
+
+        function previewSite() {
+            window.open('/', '_blank');
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/admin/index.html';
+        }
+
+        // Load data on page load
+        loadDashboardData();
+    </script>
+</body>
+</html>
